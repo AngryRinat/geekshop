@@ -1,8 +1,9 @@
 from django.shortcuts import render, HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView
 
 from users.models import User
 from admins.forms import UserAdminRegistrationForm, UserAdminProfileForm
@@ -14,24 +15,19 @@ def index(request):
     return render(request, 'admins/index.html', context)
 
 
-class UserListView(ListView):
+class UserAdminListView(ListView):
     model = User
     template_name = 'admins/admin-users-read.html'
 
 
-# Create controller
-@user_passes_test(lambda u: u.is_staff)
-def admin_users_create(request):
-    if request.method == 'POST':
-        form = UserAdminRegistrationForm(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Пользователь успешно создан.')
-            return HttpResponseRedirect(reverse('admin_staff:admin_users'))
-    else:
-        form = UserAdminRegistrationForm()
-    context = {'title': 'GeekShop - Admin', 'form': form}
-    return render(request, 'admins/admin-users-create.html', context)
+class UserAdminCreateView(CreateView):
+    model = User
+    template_name = 'admins/admin-users-create.html'
+    form_class = UserAdminRegistrationForm
+    success_url = reverse_lazy('admin_staff:admin_users')
+
+
+
 
 
 # Update controller
