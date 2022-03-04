@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.utils.decorators import method_decorator
 
 from users.models import User
 from admins.forms import UserAdminRegistrationForm, UserAdminProfileForm
@@ -23,6 +24,10 @@ class UserAdminListView(ListView):
         context = super(UserAdminListView, self).get_context_data(object_list=None, **kwargs)
         context['title'] = 'Geekshop - Admin'
         return context
+
+    @method_decorator(user_passes_test(lambda u: u.is_staff))
+    def dispatch(self, request, *args, **kwargs):
+        return super(UserAdminListView,self).dispatch(request,*args,*kwargs)
 
 
 class UserAdminCreateView(CreateView):
