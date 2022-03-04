@@ -19,6 +19,11 @@ class UserAdminListView(ListView):
     model = User
     template_name = 'admins/admin-users-read.html'
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(UserAdminListView, self).get_context_data(object_list=None, **kwargs)
+        context['title'] = 'Geekshop - Admin'
+        return context
+
 
 class UserAdminCreateView(CreateView):
     model = User
@@ -42,3 +47,7 @@ class UserAdminDeleteView(DeleteView):
     success_url = reverse_lazy('admin_staff:admin_users')
 
 
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.safe_delete()
+        return HttpResponseRedirect(self.success_url)
